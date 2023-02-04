@@ -1,0 +1,31 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+    - name: upgrade
+      apt:
+        upgrade: dist
+
+    - name: Install apache
+      apt:
+        name: apache2
+        state: present
+        update_cache: yes
+      notify:
+        - apache  started
+
+    - name: Run command to write hostname to index.html
+      script: app.sh
+      notify:
+       - apache restarted
+
+  handlers:
+    - name: apache  started
+      service:
+        name: apache2
+        state: started
+    - name: apache restarted
+      service:
+        name: apache2
+        state: restarted
